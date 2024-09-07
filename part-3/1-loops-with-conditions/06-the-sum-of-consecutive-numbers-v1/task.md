@@ -10,3 +10,8 @@ Limit: 18
 21
 
 If you have trouble understanding how the desired output is calculated, the sample outputs in the next exercise may help. You may assume the number typed in by the user is always equal to 2 or higher.
+
+
+TODO:
+    - решить за постоянное время (O(1))
+    - написать

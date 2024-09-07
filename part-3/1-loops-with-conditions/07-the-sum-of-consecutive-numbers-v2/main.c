@@ -27,6 +27,11 @@ int main() {
             // Только 0 - 9
             // text[idx++] = '0' + n;
             idx += snprintf(text + idx, sizeof(text) - idx, "%d", n);
+
+            /**
+             * - перевести число в строку
+             * - strcat для конкатенации
+             */
         }
 
         n++;
