@@ -1,18 +1,7 @@
 #include <stdio.h>
+#include "../../../../lib/input.h"
 
 #define MAX_LENGTH 5
-
-void print_arr(int *ptr, int length) {
-    printf("The list is now [");
-    for (int idx = 0; idx < length; idx++) {
-        printf("%i", *(ptr+idx));
-
-        if (idx < length - 1) {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
 
 void get_command(char *command) {
     char c = 0;
@@ -30,7 +19,8 @@ int main() {
     char command;
 
     while (1) {
-        print_arr(arr, length);
+        print_int_arr(arr, length);
+        printf("\n");
         get_command(&command);
 
         switch(command) {

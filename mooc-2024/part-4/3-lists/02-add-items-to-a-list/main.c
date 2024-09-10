@@ -1,16 +1,16 @@
 #include <stdio.h>
+#include "../../../../lib/input.h"
 
 #define MAX_LENGTH 10
 
 int main() {
     int arr[MAX_LENGTH];
-    unsigned short idx = 0;
-    unsigned short length = 0;
+    short idx = 0;
 
-    printf("How many items: ");
-    scanf("%hu", &length);
+    int length = ask_for_int("How many items: ");
 
     if (length > MAX_LENGTH || length < 0) {
+        printf("Length is out of range\n");
         return 1;
     }
 
@@ -19,20 +19,15 @@ int main() {
         return 0;
     }
 
+    char str_ptr[10];
+
     for (idx = 0; idx < length; idx++) {
-        printf("Item %i: ", idx + 1);
-        scanf("%i", arr + idx);
+        sprintf(str_ptr, "Item %i: ", idx);
+        arr[idx] = ask_for_int(str_ptr);
     }
 
-    printf("[");
-    for (idx = 0; idx < length; idx++) {
-        printf("%i", arr[idx]);
-
-        if (idx < length - 1) {
-            printf(", ");
-        }
-    }
-    printf("]\n");
+    print_int_arr(arr, length);
+    printf("\n");
 
     return 0;
 }

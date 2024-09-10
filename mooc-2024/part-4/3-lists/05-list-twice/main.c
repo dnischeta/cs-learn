@@ -1,9 +1,9 @@
 #include <stdio.h>
+#include "../../../../lib/input.h"
 
 #define MAX_LENGTH 10
 
 void insert_to_sorted(int *, int, int);
-void print_arr(int *, int);
 
 int main() {
     int length = 0;
@@ -17,8 +17,7 @@ int main() {
             break;
         }
 
-        printf("New item: ");
-        scanf("%i", &el);
+        el = ask_for_int("New item: ");
 
         if (el == 0) {
             printf("Bye!\n");
@@ -30,10 +29,10 @@ int main() {
         length++;
 
         printf("The list now: ");
-        print_arr(arr, length);
+        print_int_arr(arr, length);
         printf("\n");
         printf("The list in order: ");
-        print_arr(sorted_arr, length);
+        print_int_arr(sorted_arr, length);
         printf("\n");
     }
 
@@ -63,16 +62,4 @@ void insert_to_sorted(int *arr, int num, int len) {
     }
 
     *(arr + first_greater_idx) = num;
-}
-
-void print_arr(int *arr, int len) {
-    printf("[");
-    for (int idx = 0; len > 0; len--, idx++) {
-        printf("%i", *(arr+idx));
-
-        if (len > 1) {
-            printf(", ");
-        }
-    }
-    printf("]");
 }
