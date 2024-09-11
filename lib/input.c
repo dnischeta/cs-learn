@@ -60,3 +60,15 @@ void print_int_arr(int arr[], int length) {
     }
     printf("]");
 }
+
+void print_str_arr(char *arr[], int length) {
+    printf("[");
+    for (int idx = 0; idx < length; idx++) {
+        printf("%s", arr[idx]);
+
+        if (idx < length - 1) {
+            printf(", ");
+        }
+    }
+    printf("]");
+}
