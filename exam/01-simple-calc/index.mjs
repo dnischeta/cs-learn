@@ -15,6 +15,7 @@ const EXITING_MESSAGE = 'Exiting calculator.';
 const CALCULATION_ERROR = 'Calculation error appeared.'
 const HELP_MESSAGE = "\nSimple Calculator is able to calculate single-line expressions.\nExpression is a string: A <OP> B, where:\n  - A, B - operands;\n  - <OP> - is one of supported operations: +, -, *, /, //, %%, **.\n\n";
 const DIVISION_BY_ZERO_MESSAGE = 'Error: division by zero.';
+const NAN_OPERAND_MESSAGE = 'One of operands is not a number.';
 const UNKNOWN_COMMAND_MESSAGE = (op) => `Unknown command ${op}. Please, use only supported OPs.`;
 const ANSWER_MESSAGE = (question, answer) => `${question} = ${answer}`;
 
@@ -51,6 +52,12 @@ async function main() {
 
         const a = parseFloat(entries[0]);
         const b = parseFloat(entries[2]);
+
+        if (Number.isNaN(a) || Number.isNaN(b)) {
+            console.log(NAN_OPERAND_MESSAGE);
+            continue;
+        }
+
         const op = entries[1];
         let answer = 0;
 
