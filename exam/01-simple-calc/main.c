@@ -6,19 +6,14 @@
 #include <errno.h>
 #include <math.h>
 
-const char WELCOME_MESSAGE[] = "Welcome to Simple Calculator program.\nEnter 'h' to see an instruction.\n";
-const char ASK_FOR_COMMAND_MESSAGE[] = "Enter a command: ";
-const char INCORRECT_COMMAND_MESSAGE[] = "Failed to parse last command. Please, enter correct command.";
-const char EXITING_MESSAGE[] = "Exiting calculator.\n";
-const char CALCULATION_ERROR[] = "Calculation error appeared.";
-const char UNKNOWN_COMMAND_MESSAGE[] = "Unknown OP: %s. Please, use only supported OPs.\n";
-const char ANSWER_MESSAGE[] = "%s = %g\n";
-const char HELP_MESSAGE[] = "\nSimple Calculator is able to calculate single-line expressions.\nExpression is a string: A <OP> B, where:\n  - A, B - operands;\n  - <OP> - is one of supported operations: +, -, *, /, //, %%, **.\n\n";
+#define COMMAND_EXIT 'q'
+#define COMMAND_HELP 'h'
+#define MAX_COMMAND_LENGTH 100
+#define EPSILON 1e-10
 
-const char COMMAND_EXIT = 'q';
-const char COMMAND_HELP = 'h';
-const int MAX_COMMAND_LENGTH = 100;
-const float EPSILON = 0.000000001;
+int parseOperand(float *, char *, char **);
+
+char UNKNOWN_OP_MESSAGE[] = "Unknown OP: %s. Please, use only supported OPs.\n";
 
 int main()
 {
@@ -26,18 +21,23 @@ int main()
     float a, b, result;
     char command[MAX_COMMAND_LENGTH];
 
-    printf(WELCOME_MESSAGE);
+    printf("Welcome to Simple Calculator program.\nEnter 'h' to see an instruction.\n");
 
     while (!closing)
     {
-        printf(ASK_FOR_COMMAND_MESSAGE);
+        printf("Enter a command: ");
 
         if (fgets(command, MAX_COMMAND_LENGTH, stdin))
         {
-            command[strcspn(command, "\n")] = 0;
+            command[strlen(command) - 1] = 0;
+        }
+        else
+        {
+            printf("Failed to read command.\n");
+            break;
         }
 
-        if (command[0] == 0) // Empty command -> just ask again
+        if (command[0] == 0)
         {
             continue;
         }
@@ -46,76 +46,66 @@ int main()
         {
             switch (command[0])
             {
-            case COMMAND_EXIT:
-            {
-                printf(EXITING_MESSAGE);
-                closing = 1;
-                break;
-            }
-            case COMMAND_HELP:
-            {
-                printf(HELP_MESSAGE);
-                break;
-            }
+                case COMMAND_EXIT:
+                    printf("Exiting calculator.\n");
+                    closing = 1;
+                    break;
+                case COMMAND_HELP:
+                    printf("\nSimple Calculator is able to calculate single-line expressions.\nExpression is a string: A <OP> B, where:\n  - A, B - operands;\n  - <OP> - is one of supported operations: +, -, *, /, //, %%, **.\n\n");
+                    break;
+                default:
+                    printf("Unknown command: %s. Please, use only supported commands.\n", command);
+                    continue;
             }
         }
         else
         {
-            int op_length = 0;
-            char *rest, *op_start;
-            errno = 0;
-            a = strtof(command, &rest);
+            char aParsed = 0, bParsed = 0, opParsed = 0;
+            int idx = 0, op_length = 0;
+            float a, b;
+            char *rest, *op_start = NULL;
 
-            if (errno == ERANGE)
-            {
-                printf("A is too big.\n");
-                continue;
+            while (command[idx] && idx < MAX_COMMAND_LENGTH && !(aParsed && bParsed && opParsed)) {
+                if (isspace(command[idx])) {
+                    idx++;
+                    continue;
+                }
+
+                if (!aParsed) {
+                    aParsed = parseOperand(&a, command, &rest);
+                    idx += rest - command;
+
+                    if (!aParsed) {
+                        break;
+                    }
+                } else if (!opParsed) {
+                    if (op_start == NULL) {
+                        op_start = command + idx;
+                    }
+                    op_length++;
+                    idx++;
+
+                    if (isspace(command[idx]) || isdigit(command[idx]) || isalpha(command[idx])) {
+                        opParsed = 1;
+                    }
+                } else if (!bParsed) {
+                    bParsed = parseOperand(&b, command + idx, &rest);
+
+                    if (!bParsed) {
+                        break;
+                    }
+                }
             }
 
-            if (rest == command) // It took 0 chars to read float
-            {
-                printf("A is not a number.\n");
-                continue;
-            }
-
-            while (isspace(*rest))
-            {
-                rest++;
-            }
-
-            op_start = rest;
-            while (!isspace(*rest))
-            {
-                rest++;
-                op_length++;
-            }
-
-            while (isspace(*rest))
-            {
-                rest++;
-            }
-
-            char *end_b;
-
-            errno = 0;
-            b = strtof(rest, &end_b);
-
-            if (errno == ERANGE)
-            {
-                printf("B is too large\n");
-                continue;
-            }
-
-            if (rest == end_b)
-            {
-                printf("B is not a number.\n");
+            if (!aParsed || !bParsed || !opParsed) {
+                printf("Failed to parse command: %s\n", command);
                 continue;
             }
 
             if (op_length > 2 || op_length == 0)
             {
                 *(op_start + op_length) = 0;
-                printf(UNKNOWN_COMMAND_MESSAGE, op_start);
+                printf(UNKNOWN_OP_MESSAGE, op_start);
                 continue;
             }
 
@@ -157,12 +147,12 @@ int main()
                         printf("Error. Division by zero.\n");
                         continue;
                     }
-                    result = (int)a % (int)b;
+                    result = fmod(a, b);
                     break;
                 }
                 default:
                 {
-                    printf(UNKNOWN_COMMAND_MESSAGE, op_start);
+                    printf(UNKNOWN_OP_MESSAGE, op_start);
                     continue;
                 }
                 }
@@ -190,20 +180,36 @@ int main()
                 else
                 {
                     *(op_start + op_length) = 0;
-                    printf("LOL LOL\n");
-                    printf(UNKNOWN_COMMAND_MESSAGE, op_start);
+                    printf(UNKNOWN_OP_MESSAGE, op_start);
                     continue;
                 }
             }
             }
 
-            if (result > INT_MAX || result <= INT_MIN)
+            if (isinf(result) || isnan(result))
             {
-                printf("Error. Result is too large.\n");
+                printf("Error. Result is infinity or not a number.\n");
                 continue;
             }
 
-            printf(ANSWER_MESSAGE, command, result);
+            printf("%s = %g\n", command, result);
         }
     }
+}
+
+int parseOperand(float *num, char *command, char **rest) {
+    errno = 0;
+    *num = strtof(command, rest);
+
+    if (errno == ERANGE) {
+        printf("Operand is too big.\n");
+        return 0;
+    }
+
+    if (*rest == command) {
+        printf("Operand is not a number.\n");
+        return 0;
+    }
+
+    return 1;
 }

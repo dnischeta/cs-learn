@@ -83,8 +83,4 @@ while True:
             print(UNKNOWN_COMMAND_MESSAGE(entries[2]))
             continue
 
-    if abs(answer) > (2 ** 31 - 1):
-        print(CALCULATION_ERROR)
-        continue
-
     print(ANSWER_MESSAGE(command, answer))
