@@ -1,6 +1,8 @@
 from time import perf_counter
+from functools import wraps
 
 def measure(f: callable):
+    @wraps(f)
     def withMeasure(*args, **kvargs):
         start = perf_counter()
         r = f(*args, **kvargs)

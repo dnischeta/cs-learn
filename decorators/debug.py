@@ -1,6 +1,7 @@
-from functools import reduce
+from functools import reduce, wraps
 
 def debug(f: callable):
+    @wraps(f)
     def withDebug(*args, **kvargs):
         r = f(*args, **kvargs)
         l = [*args]
