@@ -1,19 +1,17 @@
-.global _main              // точка входа для macOS
+.global _main
 .align 2
 
 _main:
-    // вывод строки
-    mov     x0, #1          // файловый дескриптор 1 (stdout)
-    adrp    x1, hello@PAGE  // загружаем страницу с адресом строки
-    add     x1, x1, hello@PAGEOFF  // добавляем смещение
-    mov     x2, #11         // длина строки
-    mov     x16, #4         // системный вызов 4 (write) для macOS
-    svc     #0x80           // вызов системы
-
-    // выход из программы
-    mov     x0, #0          // код возврата 0
-    mov     x16, #1         // системный вызов 1 (exit) для macOS
-    svc     #0x80           // вызов системы
+    MOV     x0, #1
+    ADRP    x1, hello@PAGE
+    ADD     x1, x1, hello@PAGEOFF
+    MOV     x2, #12
+    MOV     x16, #4
+    SVC     #0x80
+    
+    MOV     x0, #0
+    MOV     x16, #1
+    SVC     #0x80
 
 .data
     hello: .ascii "Hello World\n"
